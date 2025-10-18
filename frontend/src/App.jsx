@@ -4,6 +4,14 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Members from "./pages/Members";
 import Reminders from "./pages/Reminders";
+import ProfilePage from "./pages/ProfilePage";
+import { Navigate } from "react-router-dom";
+
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" replace />;
+}
+
 
 export default function App() {
   return (
@@ -14,6 +22,13 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/members" element={<Members />} />
         <Route path="/reminders" element={<Reminders />} />
+        <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </Router>
   );

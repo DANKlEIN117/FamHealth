@@ -14,15 +14,17 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await API.post("/family/login", form);
-      localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Invalid email or password");
-    }
-  };
+  e.preventDefault();
+  try {
+    const res = await API.post("/family/login", form);
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("familyName", res.data.familyName);
+    navigate("/profile");  // go straight to profile instead of dashboard
+  } catch (err) {
+    setError("Invalid email or password");
+  }
+};
+
 
   return (
     <>

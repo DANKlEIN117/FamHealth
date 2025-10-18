@@ -1,17 +1,40 @@
 import Member from "../models/Member.js";
-import Family from "../models/Family.js";
+
 
 export const addMember = async (req, res) => {
   try {
-    const { familyId, name, age, gender, healthHistory } = req.body;
-    const family = await Family.findById(familyId);
-    if (!family) return res.status(404).json({ message: "Family not found" });
-
-    const member = await Member.create({ name, age, gender, healthHistory, family: familyId });
-    family.members.push(member._id);
-    await family.save();
-
+    const { name, role } = req.body;
+    const familyId = req.user.id;
+    const member = await Member.create({ name, role, family: familyId });
     res.status(201).json(member);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
+export const getMembers = async (req, res) => {
+  try {
+    const members = await Member.find({ family: req.user.id });
+    res.json(members);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateMember = async (req, res) => {
+  try {
+    const member = await Member.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(member);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export const deleteMember = async (req, res) => {
+  try {
+    await Member.findByIdAndDelete(req.params.id);
+    res.json({ message: "Member deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

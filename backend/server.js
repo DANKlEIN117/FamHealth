@@ -32,6 +32,10 @@ import reminderRoutes from "./routes/reminderRoutes.js";
 app.use("/api/reminders", reminderRoutes);
 
 
+app.use("/api/members", memberRoutes);
+
+
+
 
 // Port
 const PORT = process.env.PORT || 5000;

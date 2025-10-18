@@ -1,12 +1,50 @@
-export default function Navbar() {
-  return (
-    <nav className="flex justify-between items-center px-8 py-4 bg-blue-600 text-white shadow-md">
-      <h1 className="text-2xl font-bold tracking-wide">FamHealth</h1>
+import { Link, useNavigate } from "react-router-dom";
 
-      <div className="flex gap-6">
-        <a href="/" className="hover:text-gray-200 transition">Home</a>
-        <a href="/login" className="hover:text-gray-200 transition">Login</a>
-        <a href="/signup" className="hover:text-gray-200 transition">Sign Up</a>
+export default function Navbar() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const familyName = localStorage.getItem("familyName");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("familyName");
+    navigate("/");
+  };
+
+  return (
+    <nav className="flex justify-between items-center px-8 py-4 bg-blue-700 text-white">
+      <h1 className="text-xl font-bold">
+        FamHealth
+        {token && familyName ? (
+          <span className="ml-3 text-sm font-normal text-blue-200">
+            | Welcome, {familyName}
+          </span>
+        ) : null}
+      </h1>
+
+      <div className="flex gap-4">
+        {!token ? (
+          <>
+            <Link to="/" className="hover:text-blue-200">
+              Login
+            </Link>
+            <Link to="/signup" className="hover:text-blue-200">
+              Signup
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/profile" className="hover:text-blue-200">
+              Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-white text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-100"
+            >
+              Logout
+            </button>
+          </>
+        )}
       </div>
     </nav>
   );
