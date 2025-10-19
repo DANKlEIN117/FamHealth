@@ -58,8 +58,26 @@ export const loginFamily = async (req, res) => {
 export const getFamilies = async (req, res) => {
   try {
     const families = await Family.find().populate("members");
-    res.json(families);
+    res.json(members);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getFamilyProfile = async (req, res) => {
+  try {
+    const family = await Family.findById(req.user._id).populate("members");
+    if (!family) return res.status(404).json({ message: "Family not found" });
+
+    res.json({
+      _id: family._id,
+      familyName: family.familyName,
+      email: family.email,
+      members: family.members, // 👈 includes all members
+    });
+  } catch (error) {
+    console.error("Error fetching family profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

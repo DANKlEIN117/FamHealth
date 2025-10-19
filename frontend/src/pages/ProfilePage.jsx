@@ -21,10 +21,8 @@ export default function ProfilePage() {
         // Fetch family
         const famRes = await API.get("/family/profile", config);
         setFamilyName(famRes.data.familyName);
+        setMembers(famRes.data.members || []);
 
-        // Fetch members
-        const memRes = await API.get("/members", config);
-        setMembers(memRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
