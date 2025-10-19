@@ -12,23 +12,37 @@ export default function ProfilePage() {
   const [date, setDate] = useState(new Date());
 
   // Fetch family info and members
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const config = { headers: { Authorization: `Bearer ${token}` } };
+  // Fetch family info and members
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Fetch family
-        const famRes = await API.get("/family/profile", config);
-        setFamilyName(famRes.data.familyName);
-        setMembers(famRes.data.members || []);
+      // Fetch family + members
+      const famRes = await API.get("/family/profile", config);
+      setFamilyName(famRes.data.familyName);
+      setMembers(famRes.data.members || []);
 
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchData();
-  }, []);
+      // Fetch reminders for all members
+      const reminderPromises = (famRes.data.members || []).map(async (member) => {
+        const res = await API.get(`/reminders/${member._id}`, config);
+        return res.data.map((r) => ({
+          ...r,
+          memberName: member.name,
+        }));
+      });
+
+      const remindersArrays = await Promise.all(reminderPromises);
+      setAlerts(remindersArrays.flat()); // flatten all member reminders
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  fetchData();
+}, []);
+
 
   const handleAddMember = async () => {
     const name = prompt("Enter member name:");
@@ -44,6 +58,38 @@ export default function ProfilePage() {
       console.error("Failed to add member", error);
     }
   };
+  const handleAddDrugAlert = async () => {
+  if (members.length === 0) return alert("No members available");
+
+  const memberOptions = members.map((m, i) => `${i + 1}. ${m.name}`).join("\n");
+  const selected = prompt(`Select member by number:\n${memberOptions}`);
+  const memberIndex = parseInt(selected) - 1;
+  const member = members[memberIndex];
+  if (!member) return alert("Invalid member selected.");
+
+  const medicine = prompt("Enter medicine name:");
+  const dosage = prompt("Enter dosage:");
+  const time = prompt("Enter time (e.g. 2025-10-18T10:00:00Z):");
+  const note = prompt("Add note (optional):");
+
+  try {
+    const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    const res = await API.post("/reminders/add", {
+      memberId: member._id,
+      medicine,
+      dosage,
+      time,
+      note,
+    }, config);
+
+    alert("Drug reminder added successfully!");
+    setAlerts([...alerts, { ...res.data.reminder, memberName: member.name }]);
+  } catch (error) {
+    console.error("Error adding reminder:", error);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -92,21 +138,30 @@ export default function ProfilePage() {
               ) : (
                 alerts.map((alert) => (
                   <li
-                    key={alert.id}
+                    key={alert._id}
                     className={`p-2 rounded-lg ${
-                      alert.level === "urgent"
+                      new Date(alert.time) < new Date()
                         ? "bg-red-100 text-red-600"
                         : "bg-green-100 text-green-600"
                     }`}
                   >
-                    {alert.text}
+                    💊 {alert.medicine} ({alert.dosage}) — {alert.memberName}
+                    <br />
+                    <span className="text-sm text-gray-500">
+                      {new Date(alert.time).toLocaleString()}
+                    </span>
                   </li>
                 ))
               )}
             </ul>
-            <button className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+
+            <button
+              onClick={handleAddDrugAlert}
+              className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            >
               + Add Drug Alert
             </button>
+
           </div>
 
           {/* Calendar */}
