@@ -1,5 +1,7 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const diseases = [
   { name: "HIV", data: [5, 7, 6, 8, 9, 10, 8, 7, 6, 8, 9, 11] },
@@ -18,33 +20,38 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 const DiseaseTrendsPage = () => {
   return (
-    <div className="p-6 bg-gray-50 min-h-screen overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200">
-      <h1 className="text-3xl font-bold mb-6 text-center">Disease Trends </h1>
+    <>
+    <Navbar />
+      <div className="p-6 bg-gray-50 min-h-screen overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-200">
+        <h1 className="text-3xl font-bold mb-6 text-center"> Major Diseases Trends 2024</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {diseases.map((disease, index) => {
-          const chartData = months.map((month, i) => ({
-            month,
-            value: disease.data[i],
-          }));
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {diseases.map((disease, index) => {
+            const chartData = months.map((month, i) => ({
+              month,
+              value: disease.data[i],
+            }));
 
-          return (
-            <div key={index} className="bg-white p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
-              <h2 className="text-xl font-semibold mb-2 text-center text-blue-700">{disease.name}</h2>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          );
-        })}
+            return (
+              
+              <div key={index} className="bg-white p-4 rounded-2xl shadow-md hover:shadow-lg transition-shadow">
+                <h2 className="text-xl font-semibold mb-2 text-center text-blue-700">{disease.name}</h2>
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
