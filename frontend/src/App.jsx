@@ -5,7 +5,7 @@ import Members from "./pages/Members";
 import Reminders from "./pages/Reminders";
 import ProfilePage from "./pages/ProfilePage";
 import { Navigate } from "react-router-dom";
-
+import AnalyticsPage from "./pages/AnalyticsPage";
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" replace />;
@@ -26,6 +26,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/analytics" element={<AnalyticsPage />} />
+
 
       </Routes>
     </Router>
