@@ -2,6 +2,7 @@ import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import AivanaChat from "../components/AivanaChat";
 
 const diseases = [
   { name: "HIV", data: [5, 7, 6, 8, 9, 10, 8, 7, 6, 8, 9, 11] },
@@ -51,6 +52,7 @@ const DiseaseTrendsPage = () => {
         </div>
       </div>
       <Footer />
+      <AivanaChat />
     </>
   );
 };

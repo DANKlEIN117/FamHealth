@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import API from "../api";
+import AivanaChat from "../components/AivanaChat";
 
 
 export default function ProfilePage() {
@@ -194,13 +195,14 @@ useEffect(() => {
             onClick={() => (window.location.href = "/analytics")}
             className="mt-3 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition"
           >
-            📊 View Family Health Analytics
+            View Family Health Analytics
           </button>
 
         </aside>
       </main>
 
       <Footer />
+      <AivanaChat />
     </div>
   );
 }

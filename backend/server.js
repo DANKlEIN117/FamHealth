@@ -34,6 +34,8 @@ app.use("/api/reminders", reminderRoutes);
 
 app.use("/api/members", memberRoutes);
 
+import aivanaRouter from "./routes/aivana.js";
+app.use("/api/aivana", aivanaRouter);
 
 
 
