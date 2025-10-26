@@ -1,5 +1,5 @@
 import express from "express";
-import { registerFamily, loginFamily, getFamilies, getFamilyProfile, changeFamilyPassword, deleteFamilyAccount } from "../controllers/familyController.js";
+import { registerFamily, loginFamily, getFamilies, getFamilyProfile, changeFamilyPassword, deleteFamilyAccount, deleteMember, updateFamily } from "../controllers/familyController.js";
 import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -10,5 +10,7 @@ router.get("/", protect, getFamilies); // protected route
 router.get("/profile", protect, getFamilyProfile);
 router.put("/change-password", protect, changeFamilyPassword);
 router.delete("/delete-account", protect, deleteFamilyAccount);
+router.delete("/members/:memberId", protect, deleteMember);
+router.put("/update", protect, updateFamily);
 
 export default router;

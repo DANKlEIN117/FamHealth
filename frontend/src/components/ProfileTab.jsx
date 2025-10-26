@@ -114,14 +114,14 @@ const ProfileTab = ({ family, onLogout }) => {
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-blue placeholder-gray-400"
+            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
             placeholder="Name"
           />
           <input
             type="email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-blue placeholder-gray-400"
+            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
             placeholder="Email"
           />
 

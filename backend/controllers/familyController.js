@@ -2,6 +2,7 @@ import Family from "../models/Family.js";
 import generateToken from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import Member from "../models/Member.js";
 
 // Register Family
 export const registerFamily = async (req, res) => {
@@ -113,5 +114,56 @@ export const deleteFamilyAccount = async (req, res) => {
     res.json({ message: "Account deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const familyId = req.user.id; // from protect middleware
+
+    // 1️⃣ Find the family
+    const family = await Family.findById(familyId);
+    if (!family) {
+      return res.status(404).json({ message: "Family not found" });
+    }
+
+    // 2️⃣ Check if the member belongs to the family
+    if (!family.members.includes(memberId)) {
+      return res.status(403).json({ message: "Member not part of this family" });
+    }
+
+    // 3️⃣ Remove member from family array
+    family.members = family.members.filter(
+      (id) => id.toString() !== memberId.toString()
+    );
+    await family.save();
+
+    // 4️⃣ Delete the member document itself
+    await Member.findByIdAndDelete(memberId);
+
+    res.json({ message: "Member removed successfully" });
+  } catch (error) {
+    console.error("Error deleting member:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const updateFamily = async (req, res) => {
+  try {
+    const family = await Family.findById(req.user.id);
+    if (!family) return res.status(404).json({ message: "Family not found" });
+
+    family.familyName = req.body.familyName || family.familyName;
+    family.email = req.body.email || family.email;
+
+    const updatedFamily = await family.save();
+    res.json({
+      _id: updatedFamily._id,
+      familyName: updatedFamily.familyName,
+      email: updatedFamily.email,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

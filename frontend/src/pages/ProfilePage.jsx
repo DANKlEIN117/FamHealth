@@ -5,6 +5,8 @@ import "react-calendar/dist/Calendar.css";
 import API from "../api";
 import AivanaChat from "../components/AivanaChat";
 import ProfileTab from "../components/ProfileTab";
+import { toast } from "react-hot-toast";
+
 
 export default function ProfilePage() {
   const [familyName, setFamilyName] = useState("");
@@ -149,12 +151,28 @@ export default function ProfilePage() {
     email: familyEmail || "No email available",
   };
 
+  const handleDeleteMember = async (memberId) => {
+  if (window.confirm("Are you sure you want to remove this member?")) {
+    try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await API.delete(`/family/members/${memberId}`, config);
+      toast.success("Member deleted successfully");
+      setMembers(members.filter((m) => m._id !== memberId));
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting member");
+    }
+  }
+};
+
+
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <header className="flex justify-between items-center bg-blue-700 text-white py-4 px-6 relative">
         <h1 className="text-xl md:text-2xl font-semibold truncate">
-          {familyName || "Loading Family..."}
+          Welcome| {familyName || "Loading Family..."}
         </h1>
 
         <div className="relative">
@@ -190,12 +208,9 @@ export default function ProfilePage() {
             >
               + Add Member
             </button>
-            <button
-              onClick={handleAddMember}
-              className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition"
-            >
-              + Delete Member
-            </button>
+            
+            
+
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -206,8 +221,16 @@ export default function ProfilePage() {
               >
                 <h3 className="text-lg font-semibold text-gray-700">{member.name}</h3>
                 <p className="text-gray-500">{member.role}</p>
+                <button
+                  onClick={() => handleDeleteMember(member._id)}
+                  className="mt-2 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
+
               </div>
             ))}
+
           </div>
         </section>
 

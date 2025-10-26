@@ -1,15 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const familyName = localStorage.getItem("familyName");
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("familyName");
-    navigate("/");
-  };
+  
 
   return (
     <nav className="flex justify-between items-center px-8 py-4 bg-blue-700 text-white">
@@ -37,12 +32,7 @@ export default function Navbar() {
             <Link to="/profile" className="hover:text-blue-200">
               Profile
             </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-white text-blue-700 px-3 py-1 rounded-lg hover:bg-blue-100"
-            >
-              Logout
-            </button>
+            
           </>
         )}
       </div>

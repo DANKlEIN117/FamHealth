@@ -27,6 +27,7 @@ export default function App() {
           }
         />
         <Route path="/analytics" element={<AnalyticsPage />} />
+        
 
 
       </Routes>
