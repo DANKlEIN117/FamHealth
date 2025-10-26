@@ -57,7 +57,7 @@ export default function Signup() {
             <input
               type="email"
               name="email"
-              placeholder="Family Email"
+              placeholder="Family Email e.g example.example@family.ac.ke"
               onChange={handleChange}
               className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
             />

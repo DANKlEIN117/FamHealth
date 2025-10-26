@@ -81,3 +81,37 @@ export const getFamilyProfile = async (req, res) => {
   }
 };
 
+// Change Password
+// Change Password (Fixed)
+export const changeFamilyPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const family = await Family.findById(req.user.id);
+    if (!family) return res.status(404).json({ message: "Family not found" });
+
+    const isMatch = await family.matchPassword(oldPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    family.password = newPassword; // ✅ Don't hash manually
+    await family.save(); // pre('save') hook will hash automatically
+
+    res.json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// Delete Account
+export const deleteFamilyAccount = async (req, res) => {
+  try {
+    await Family.findByIdAndDelete(req.user.id);
+    res.json({ message: "Account deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
