@@ -6,6 +6,7 @@ import API from "../api";
 import AivanaChat from "../components/AivanaChat";
 import ProfileTab from "../components/ProfileTab";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 
 export default function ProfilePage() {
@@ -289,6 +290,14 @@ export default function ProfilePage() {
           >
             View Family Health Analytics
           </button>
+
+          <Link
+            to="/emergency"
+            className="fixed bottom-4 left-4 bg-red-600 text-white p-3 rounded-full shadow-lg text-xl hover:bg-red-700"
+          >
+            🚨
+          </Link>
+
         </aside>
       </main>
 
