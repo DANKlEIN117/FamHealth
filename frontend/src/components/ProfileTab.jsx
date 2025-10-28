@@ -18,7 +18,7 @@ const ProfileTab = ({ family, onLogout }) => {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      const res = await API.put("/family/update", { familyName: newName, email: newEmail }, config);
+      await API.put("/family/update", { familyName: newName, email: newEmail }, config);
       alert("✅ Profile updated successfully!");
       setEditing(false);
       window.location.reload(); // Refresh to show updated info
