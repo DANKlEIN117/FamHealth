@@ -162,7 +162,7 @@ export default function ProfilePage() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await API.delete(`/family/members/${memberId}`, config);
+      await API.delete(`/members/${memberId}`, config);
       toast.success("Member deleted successfully");
       setMembers(members.filter((m) => m._id !== memberId));
     } catch (err) {
