@@ -4,6 +4,7 @@ import API from "../api";
 import familyImage from "../assets/Family.jpeg";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Spinner from "../components/Spinner";
 
 export default function Signup() {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ export default function Signup() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -19,17 +21,21 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await API.post("/family/register", form);
       navigate("/");
     } catch (err) {
       setError("Registration failed. Try again.");
+    }finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
       <Navbar />
+      {loading && <Spinner show={loading}/>}
 
       <div className="flex h-screen">
         {/* Left side image */}

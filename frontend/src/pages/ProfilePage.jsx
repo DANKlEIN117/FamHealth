@@ -7,6 +7,7 @@ import AivanaChat from "../components/AivanaChat";
 import ProfileTab from "../components/ProfileTab";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 
 export default function ProfilePage() {
@@ -16,9 +17,11 @@ export default function ProfilePage() {
   const [alerts, setAlerts] = useState([]);
   const [date, setDate] = useState(new Date());
   const [showProfileTab, setShowProfileTab] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -40,6 +43,8 @@ export default function ProfilePage() {
         setAlerts(remindersArrays.flat());
       } catch (error) {
         console.error("Error fetching data:", error);
+      }finally {
+      setLoading(false);
       }
     };
     fetchData();
@@ -169,6 +174,8 @@ export default function ProfilePage() {
 
 
   return (
+    <>
+    {loading && <Spinner show={loading}/>}
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
       <header className="flex justify-between items-center bg-blue-700 text-white py-4 px-6 relative">
@@ -304,5 +311,6 @@ export default function ProfilePage() {
       <Footer />
       <AivanaChat />
     </div>
+    </>
   );
 }

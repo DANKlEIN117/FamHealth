@@ -5,11 +5,12 @@ import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import AivanaChat from "../components/AivanaChat";
+import Spinner from "../components/Spinner";
 
 const EmergencyPage = () => {
   const [position, setPosition] = useState(null);
   const [hospitals, setHospitals] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Use browser geolocation
   useEffect(() => {
@@ -32,6 +33,7 @@ const EmergencyPage = () => {
 
   // Fetch nearby hospitals from OpenStreetMap
   const fetchHospitals = async (lat, lon) => {
+    setLoading(true);
     try {
       const query = `
         [out:json];
@@ -49,7 +51,8 @@ const EmergencyPage = () => {
       setHospitals(hospitalsData);
     } catch (error) {
       console.error("Error fetching hospitals:", error);
-    }
+    }finally {
+        setLoading(false);}
   };
 
   const userIcon = new L.Icon({
@@ -64,6 +67,7 @@ const EmergencyPage = () => {
 
   return (
     <>
+    {loading && <Spinner show={loading}/>}
     <Navbar />
     <div className="h-screen w-full">
       <h2 className="text-center text-2xl font-bold p-4">
@@ -98,10 +102,9 @@ const EmergencyPage = () => {
           ))}
         </MapContainer>
       ) : (
-        <p className="text-center text-gray-600 mt-10">Fetching your location...</p>
+        <p className="text-center text-gray-600 mt-10">Getting Your Location...</p>
       )}
     </div>
-    <AivanaChat />
     <Footer />
     </>
   );

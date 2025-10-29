@@ -1,33 +1,39 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import API from "../api";
-import familyImage from "../assets/Family.jpeg";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Spinner from "../components/Spinner";
+import familyImage from "../assets/Family.jpeg";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await API.post("/family/login", form);
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("familyName", res.data.familyName);
-    navigate("/profile");  // go straight to profile instead of dashboard
-  } catch (err) {
-    setError("Invalid email or password");
-  }
-};
-
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await API.post("/family/login", form);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("familyName", res.data.familyName);
+      navigate("/profile");
+    } catch (err) {
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      {loading && <Spinner show={loading}/>}
+
       <Navbar />
 
       <div className="flex min-h-screen">
