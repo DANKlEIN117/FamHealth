@@ -185,7 +185,11 @@ export default function ProfilePage() {
 
         <div className="relative">
           <img
-            src="/profile.png"
+            src={
+              family.profilePic || // ✅ from backend
+              localStorage.getItem("profilePhoto") ||
+              "/profile.png"
+            }
             alt="Profile"
             onClick={() => setShowProfileTab(!showProfileTab)}
             className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:scale-105 transition"

@@ -3,6 +3,7 @@ import generateToken from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import Member from "../models/Member.js";
+import cloudinary from "../config/cloudinary.js"; 
 
 // Register Family
 export const registerFamily = async (req, res) => {
@@ -23,6 +24,7 @@ export const registerFamily = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 
 
@@ -74,7 +76,8 @@ export const getFamilyProfile = async (req, res) => {
       _id: family._id,
       familyName: family.familyName,
       email: family.email,
-      members: family.members, // 👈 includes all members
+      members: family.members,
+      profilePic: family.profilePic,  // 👈 includes all members
     });
   } catch (error) {
     console.error("Error fetching family profile:", error);
@@ -167,3 +170,35 @@ export const updateFamily = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+
+export const uploadProfilePhoto = async (req, res) => {
+  try {
+    const familyId = req.user._id;
+    const family = await Family.findById(familyId);
+
+    if (!family) {
+      return res.status(404).json({ message: "Family not found" });
+    }
+
+    // ✅ Upload the image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "FamHealth/profiles",
+    });
+
+    // ✅ Save Cloudinary URL to DB
+    family.profilePic = result.secure_url;
+    await family.save();
+
+    // ✅ Send the Cloudinary URL back to frontend
+    res.json({
+      message: "Profile photo updated successfully",
+      photoUrl: result.secure_url,
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    res.status(500).json({ message: "Upload failed" });
+  }
+};
+

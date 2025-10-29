@@ -6,6 +6,7 @@ const familySchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: "Member" }],
+  profilePic: { type: String, default: "" },
 }, { timestamps: true });
 
 // Encrypt password before save

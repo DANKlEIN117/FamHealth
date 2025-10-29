@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { LogOut, Edit, Trash, Lock } from "lucide-react";
+import { LogOut, Edit, Trash, Lock, Upload } from "lucide-react";
 import API from "../api";
 
 const ProfileTab = ({ family, onLogout }) => {
@@ -9,6 +9,8 @@ const ProfileTab = ({ family, onLogout }) => {
   const [newEmail, setNewEmail] = useState(family.email);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [photo, setPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // ✅ Update Family Info
@@ -30,29 +32,57 @@ const ProfileTab = ({ family, onLogout }) => {
     }
   };
 
-  // ✅ Change Password
+  // ✅ Upload Profile Picture
+  const handleUpload = async () => {
+    if (!photo) return alert("Please select a photo first.");
+
+    const formData = new FormData();
+    formData.append("photo", photo);
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+      const res = await API.post("/family/upload-profile", formData, config);
+      alert("📸 Profile picture updated successfully!");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to upload profile picture");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Password Change
   const handleChangePassword = async () => {
-  if (!oldPassword.trim() || !newPassword.trim()) {
-    return alert("Please fill in both old and new passwords.");
-  }
+    if (!oldPassword.trim() || !newPassword.trim()) {
+      return alert("Please fill in both old and new passwords.");
+    }
 
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("token");
-    const config = { headers: { Authorization: `Bearer ${token}` } };
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    await API.put("/family/change-password", { oldPassword, newPassword }, config);
+      await API.put("/family/change-password", { oldPassword, newPassword }, config);
 
-    alert("🔒 Password changed successfully!");
-    setOldPassword("");
-    setNewPassword("");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Failed to change password");
-  } finally {
-    setLoading(false);
-  }
-};
+      alert("🔒 Password changed successfully!");
+      setOldPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to change password");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ✅ Delete Account
   const handleDeleteAccount = async () => {
@@ -84,6 +114,46 @@ const ProfileTab = ({ family, onLogout }) => {
       <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
         Family Profile
       </h2>
+
+      {/* Upload Section */}
+      <div className="flex flex-col items-center mb-4">
+        <img
+          src={
+            photoPreview ||
+            family.profilePic || // ✅ from backend
+            localStorage.getItem("profilePhoto") ||
+            "/profile.png"
+          }
+          alt="Profile Preview"
+          className="w-24 h-24 rounded-full border-4 border-blue-500 shadow-md mb-3 object-cover"
+        />
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            setPhoto(file);
+            setPhotoPreview(URL.createObjectURL(file));
+          }}
+          className="hidden"
+          id="profile-upload"
+        />
+        <label
+          htmlFor="profile-upload"
+          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer"
+        >
+          <Upload size={18} /> Choose Photo
+        </label>
+        {photo && (
+          <button
+            onClick={handleUpload}
+            className="mt-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
+        )}
+      </div>
 
       {/* Family Info */}
       {!editing ? (
@@ -144,38 +214,36 @@ const ProfileTab = ({ family, onLogout }) => {
         </div>
       )}
 
-        {/* Password Change */}
-        <div className="mt-6 border-t pt-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
-                <Lock size={18} /> Change Password
-            </h3>
+      {/* Password Change */}
+      <div className="mt-6 border-t pt-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+          <Lock size={18} /> Change Password
+        </h3>
 
-            <input
-            type="password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
-            placeholder="Old Password"
-            />
+        <input
+          type="password"
+          value={oldPassword}
+          onChange={(e) => setOldPassword(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
+          placeholder="Old Password"
+        />
 
-            <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
-            placeholder="New Password"
-            />
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
+          placeholder="New Password"
+        />
 
-
-            <button
-                onClick={handleChangePassword}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg mt-3"
-                disabled={loading}
-            >
-                {loading ? "Updating..." : "Update Password"}
-            </button>
-        </div>
-
+        <button
+          onClick={handleChangePassword}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg mt-3"
+          disabled={loading}
+        >
+          {loading ? "Updating..." : "Update Password"}
+        </button>
+      </div>
 
       {/* Delete Account */}
       <div className="mt-6 border-t pt-4">
