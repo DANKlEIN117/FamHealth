@@ -5,7 +5,7 @@ import cloudinary from "../config/cloudinary.js";
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "famhealth_profiles",
+    folder: "FamHealth/profiles",
     allowed_formats: ["jpg", "jpeg", "png"],
   },
 });

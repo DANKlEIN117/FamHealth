@@ -5,32 +5,13 @@ import API from "../api";
 
 const ProfileTab = ({ family, onLogout }) => {
   const [editing, setEditing] = useState(false);
-  const [newName, setNewName] = useState(family.name);
+  const [newName, setNewName] = useState(family.familyName);
   const [newEmail, setNewEmail] = useState(family.email);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [photo, setPhoto] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(family.profilePic);
   const [loading, setLoading] = useState(false);
-
-  // ✅ Update Family Info
-  const handleUpdate = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-
-      await API.put("/family/update", { familyName: newName, email: newEmail }, config);
-      alert("✅ Profile updated successfully!");
-      setEditing(false);
-      window.location.reload(); // Refresh to show updated info
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to update family info");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // ✅ Upload Profile Picture
   const handleUpload = async () => {
@@ -50,8 +31,11 @@ const ProfileTab = ({ family, onLogout }) => {
       };
 
       const res = await API.post("/family/upload-profile", formData, config);
+      const newUrl = res.data.photoUrl;
+
+      setPhotoPreview(newUrl);
+      localStorage.setItem("profilePhoto", newUrl);
       alert("📸 Profile picture updated successfully!");
-      window.location.reload();
     } catch (err) {
       console.error(err);
       alert("❌ Failed to upload profile picture");
@@ -60,19 +44,43 @@ const ProfileTab = ({ family, onLogout }) => {
     }
   };
 
-  // ✅ Password Change
-  const handleChangePassword = async () => {
-    if (!oldPassword.trim() || !newPassword.trim()) {
-      return alert("Please fill in both old and new passwords.");
-    }
-
+  // ✅ Update Family Info
+  const handleUpdate = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      await API.put("/family/change-password", { oldPassword, newPassword }, config);
+      await API.put(
+        "/family/update",
+        { familyName: newName, email: newEmail },
+        config
+      );
+      alert("✅ Profile updated successfully!");
+      setEditing(false);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Failed to update family info");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // ✅ Change Password
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword)
+      return alert("Please fill in both old and new passwords.");
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await API.put(
+        "/family/change-password",
+        { oldPassword, newPassword },
+        config
+      );
       alert("🔒 Password changed successfully!");
       setOldPassword("");
       setNewPassword("");
@@ -86,8 +94,7 @@ const ProfileTab = ({ family, onLogout }) => {
 
   // ✅ Delete Account
   const handleDeleteAccount = async () => {
-    if (!window.confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
-
+    if (!window.confirm("⚠️ Delete your account? This cannot be undone.")) return;
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -120,11 +127,10 @@ const ProfileTab = ({ family, onLogout }) => {
         <img
           src={
             photoPreview ||
-            family.profilePic || // ✅ from backend
             localStorage.getItem("profilePhoto") ||
             "/profile.png"
           }
-          alt="Profile Preview"
+          alt="Profile"
           className="w-24 h-24 rounded-full border-4 border-blue-500 shadow-md mb-3 object-cover"
         />
 
@@ -158,7 +164,7 @@ const ProfileTab = ({ family, onLogout }) => {
       {/* Family Info */}
       {!editing ? (
         <div className="space-y-3 text-gray-700">
-          <p><strong>Name:</strong> {family.name}</p>
+          <p><strong>Name:</strong> {family.familyName}</p>
           <p><strong>Email:</strong> {family.email}</p>
 
           <div className="flex justify-between mt-6">
@@ -184,15 +190,13 @@ const ProfileTab = ({ family, onLogout }) => {
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
-            placeholder="Name"
+            className="w-full border rounded-lg px-3 py-2 mt-2 text-black"
           />
           <input
             type="email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
-            placeholder="Email"
+            className="w-full border rounded-lg px-3 py-2 mt-2 text-black"
           />
 
           <div className="flex justify-between">
@@ -214,7 +218,7 @@ const ProfileTab = ({ family, onLogout }) => {
         </div>
       )}
 
-      {/* Password Change */}
+      {/* Change Password */}
       <div className="mt-6 border-t pt-4">
         <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
           <Lock size={18} /> Change Password
@@ -224,7 +228,7 @@ const ProfileTab = ({ family, onLogout }) => {
           type="password"
           value={oldPassword}
           onChange={(e) => setOldPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
+          className="w-full border rounded-lg px-3 py-2 mt-2 text-black"
           placeholder="Old Password"
         />
 
@@ -232,7 +236,7 @@ const ProfileTab = ({ family, onLogout }) => {
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mt-2 text-black placeholder-gray-400"
+          className="w-full border rounded-lg px-3 py-2 mt-2 text-black"
           placeholder="New Password"
         />
 
