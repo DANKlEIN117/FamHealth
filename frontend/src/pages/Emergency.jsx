@@ -226,7 +226,8 @@ export default function EmergencyPage() {
           </div>
 
           <aside className="md:w-1/3 mt-4 md:mt-0">
-            <div className="bg-white rounded-xl shadow p-4 h-[70vh] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow p-4 h-[60vh] md:h-[70vh] overflow-y-auto mb-24 md:mb-0">
+
               <h3 className="font-semibold mb-2">Nearest hospitals</h3>
               {hospitals.length === 0 ? (
                 <p className="text-sm text-gray-500">No hospitals found nearby.</p>
