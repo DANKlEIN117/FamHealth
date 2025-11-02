@@ -23,7 +23,8 @@
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
     "node-cron": "^4.2.1",
-    "nodemailer": "^7.0.9"
+    "nodemailer": "^7.0.9",
+    "twilio": "^5.10.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

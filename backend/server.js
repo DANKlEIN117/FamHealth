@@ -8,6 +8,7 @@ import aiRoutes from "./routes/aiRoutes.js";
 import reminderRoutes from "./routes/reminderRoutes.js";
 import aivanaRouter from "./routes/aivana.js";
 import "./utils/notificationService.js";
+import emergencyRoutes from "./routes/emergencyRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,7 @@ app.use("/api/members", memberRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/aivana", aivanaRouter);
+app.use("/api/emergency", emergencyRoutes);
 
 app.get("/", (req, res) => {
   res.send("FamHealth AI Backend Running ✅");
