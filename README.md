@@ -1,6 +1,6 @@
 # FamHealth — Connecting Families to Health Services
 
-FamHealth is a **full-stack health and wellness platform** built using the **MERN stack (MongoDB, Express, React, Node.js)**.  
+[FamHealth](https://famhealthlife.netlify.app/) is a **full-stack health and wellness platform** built using the **MERN stack (MongoDB, Express, React, Node.js)**.  
 It empowers families and communities by connecting them with health services, nearby hospitals, and emergency support in real time.
 
 ---
