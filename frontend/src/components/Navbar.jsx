@@ -29,10 +29,9 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/profile" className="hover:text-blue-200">
+            <Link to="/profile" className="hover:text-yellow-200">
               Profile
-            </Link>
-            
+            </Link> 
           </>
         )}
       </div>

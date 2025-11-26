@@ -265,7 +265,7 @@ export default function EmergencyPage() {
       </div>
 
       <AivanaChat />
-      <Footer />
+      
     </>
   );
 }

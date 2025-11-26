@@ -116,7 +116,8 @@ const ProfileTab = ({ family, onLogout }) => {
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white shadow-xl rounded-2xl p-6 w-full md:w-[500px] mx-auto mt-8 border border-gray-200"
+      className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-xs md:max-w-md mx-auto mt-2 border border-gray-200 overflow-hidden"
+      style={{ maxHeight: "90vh", overflowY: "auto" }}
     >
       <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
         Family Profile
