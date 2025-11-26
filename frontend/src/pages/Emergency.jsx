@@ -4,7 +4,6 @@ import L from "leaflet";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import AivanaChat from "../components/AivanaChat";
 import Spinner from "../components/Spinner";
 import API from "../api";
@@ -100,7 +99,6 @@ export default function EmergencyPage() {
         distanceKm: haversineDistance(lat, lon, h.lat, h.lon)
       })).sort((a,b) => a.distanceKm - b.distanceKm);
 
-
       setHospitals(withDistance);
     } catch (err) {
       console.error("Error fetching hospitals:", err);
@@ -156,28 +154,34 @@ export default function EmergencyPage() {
   return (
     <>
       <Navbar />
-      <div className="h-screen w-full">
-        <div className="p-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Emergency — Nearest Hospitals</h2>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => sendSOS(hospitals[0] ?? null)}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg"
-              disabled={sosSending || !position}
-            >
-              {sosSending ? "Sending SOS..." : "Send SOS Now 🚨"}
-            </button>
-          </div>
+      <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-red-50 to-pink-50 flex flex-col relative overflow-hidden">
+        
+        {/* Animated Background Orbs */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
+          <div className="absolute -bottom-32 right-0 w-96 h-96 bg-orange-300 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
         </div>
 
-        {loading && <div className="px-4"><Spinner /></div>}
+        {/* Header */}
+        <div className="relative z-10 p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-red-600 via-orange-600 to-red-700 text-white shadow-2xl">
+          <h2 className="text-2xl md:text-3xl font-bold drop-shadow-lg">🏥 Emergency — Nearest Hospitals</h2>
 
-        {error && <p className="text-center text-red-500">{error}</p>}
-        {msg && <p className="text-center text-green-600">{msg}</p>}
+          <button
+            onClick={() => sendSOS(hospitals[0] ?? null)}
+            className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-800 hover:to-black text-white px-6 py-3 rounded-full shadow-2xl font-bold text-lg transform hover:scale-110 hover:shadow-red-500/50 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed animate-pulse"
+            disabled={sosSending || !position}
+          >
+            {sosSending ? "🚨 Sending SOS..." : "🚨 Send SOS Now"}
+          </button>
+        </div>
 
-        <div className="md:flex md:gap-4 p-4">
-          <div className="md:w-2/3 h-[70vh]">
+        {loading && <div className="relative z-10 px-4 mt-6"><Spinner /></div>}
+
+        {error && <p className="relative z-10 text-center text-red-600 font-bold text-lg mt-4 backdrop-blur bg-red-100/80 py-3 rounded-lg mx-4">⚠️ {error}</p>}
+        {msg && <p className="relative z-10 text-center text-green-600 font-bold text-lg mt-4 backdrop-blur bg-green-100/80 py-3 rounded-lg mx-4">✅ {msg}</p>}
+
+        <div className="relative z-10 flex-grow md:flex md:gap-4 p-4 overflow-hidden">
+          <div className="md:w-2/3 h-[70vh] rounded-3xl overflow-hidden shadow-2xl border-4 border-white/50 backdrop-blur-sm">
             {position ? (
               <MapContainer
                 center={position}
@@ -191,68 +195,70 @@ export default function EmergencyPage() {
                 />
                 <Recenter position={position} />
                 <Marker position={position} icon={userIcon}>
-                  <Popup>You are here</Popup>
+                  <Popup>
+                    <div className="font-bold text-blue-600">📍 You are here</div>
+                  </Popup>
                 </Marker>
                 {hospitals.map(h => (
                   <Marker key={h.id} position={[h.lat, h.lon]} icon={hospitalIcon}>
                     <Popup>
-                      <div className="text-left">
-                        <strong>🏥 {h.name}</strong>
-                        <div>{h.distanceKm} km</div>
+                      <div className="text-left space-y-3">
+                        <strong className="text-lg text-red-600">🏥 {h.name}</strong>
+                        <div className="text-sm font-semibold text-gray-700">📏 {h.distanceKm} km away</div>
                         <a
-                          className="text-blue-600 underline"
+                          className="text-blue-600 underline font-semibold hover:text-blue-800 block"
                           target="_blank"
                           rel="noreferrer"
                           href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}`}
                         >
-                          Directions
+                          🗺️ Get Directions
                         </a>
-                        <div className="mt-2">
-                          <button
-                            onClick={() => sendSOS(h)}
-                            className="bg-red-500 text-white px-2 py-1 rounded"
-                          >
-                            Send SOS to this hospital
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => sendSOS(h)}
+                          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-2 rounded-lg font-bold hover:shadow-lg transform hover:scale-105 transition"
+                        >
+                          🚨 Send SOS
+                        </button>
                       </div>
                     </Popup>
                   </Marker>
                 ))}
               </MapContainer>
             ) : (
-              <p className="text-center text-gray-600 mt-10">Fetching your location...</p>
+              <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                <p className="text-gray-600 font-semibold text-lg">📍 Fetching your location...</p>
+              </div>
             )}
           </div>
 
           <aside className="md:w-1/3 mt-4 md:mt-0">
-            <div className="bg-white rounded-xl shadow p-4 h-[60vh] md:h-[70vh] overflow-y-auto mb-24 md:mb-0">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 h-[60vh] md:h-[70vh] overflow-y-auto border border-white/30">
 
-              <h3 className="font-semibold mb-2">Nearest hospitals</h3>
+              <h3 className="font-bold text-xl mb-4 text-gray-800 bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">🏥 Nearest Hospitals</h3>
               {hospitals.length === 0 ? (
-                <p className="text-sm text-gray-500">No hospitals found nearby.</p>
+                <p className="text-sm text-gray-500 text-center py-8">No hospitals found nearby.</p>
               ) : (
-                hospitals.map(h => (
-                  <div key={h.id} className="mb-3 border-b pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium">{h.name}</div>
-                        <div className="text-xs text-gray-500">{h.distanceKm} km away</div>
+                hospitals.map((h, idx) => (
+                  <div key={h.id} className="mb-4 border-b-2 border-gradient-to-r from-red-200 to-orange-200 pb-4 hover:bg-red-50/50 p-3 rounded-xl transition duration-300">
+                    <div className="flex justify-between items-start gap-3">
+                      <div className="flex-grow">
+                        <div className="font-bold text-gray-800 text-lg">{idx + 1}. {h.name}</div>
+                        <div className="text-xs text-gray-600 font-semibold mt-1">📏 {h.distanceKm} km away</div>
                       </div>
                       <div className="flex flex-col gap-2">
                         <a
-                          className="text-sm underline"
+                          className="text-sm text-blue-600 underline font-bold hover:text-blue-800"
                           target="_blank"
                           rel="noreferrer"
                           href={`https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}`}
                         >
-                          Directions
+                          🗺️
                         </a>
                         <button
                           onClick={() => sendSOS(h)}
-                          className="text-sm bg-red-500 text-white px-2 py-1 rounded"
+                          className="text-sm bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg font-bold hover:shadow-lg transform hover:scale-105 transition"
                         >
-                          SOS
+                          🚨
                         </button>
                       </div>
                     </div>
@@ -260,11 +266,11 @@ export default function EmergencyPage() {
                 ))
               )}
             </div>
+            <AivanaChat />
           </aside>
         </div>
       </div>
 
-      <AivanaChat />
       
     </>
   );
